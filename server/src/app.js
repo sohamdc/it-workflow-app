@@ -6,6 +6,7 @@ const healthRoutes = require('./routes/health');
 const authRoutes = require('./routes/auth');
 const testProtectedRoutes = require('./routes/testProtected');
 const auditRoutes = require('./routes/audit');
+const sopRoutes = require('./routes/sop');
 const errorHandler = require('./middleware/errorHandler');
 
 const app = express();
@@ -22,6 +23,7 @@ app.use('/api/health', healthRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/test-protected', testProtectedRoutes);
 app.use('/api/audit', auditRoutes);
+app.use('/api/sop', sopRoutes);
 
 app.use(errorHandler);
 
