@@ -1,0 +1,171 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum SopStatus {
+  draft
+  published
+}
+
+enum StageStatus {
+  NotStarted
+  InProgress
+  Blocked
+  OnHold
+  Completed
+}
+
+enum MemberKind {
+  MEMBER
+  CLIENT
+}
+
+model Permission {
+  id     Int              @id @default(autoincrement())
+  module String
+  action String
+  roles  RolePermission[]
+
+  @@unique([module, action])
+}
+
+model Role {
+  id          Int              @id @default(autoincrement())
+  name        String           @unique
+  permissions RolePermission[]
+  users       User[]
+}
+
+model RolePermission {
+  roleId       Int
+  permissionId Int
+  role         Role       @relation(fields: [roleId], references: [id])
+  permission   Permission @relation(fields: [permissionId], references: [id])
+
+  @@id([roleId, permissionId])
+}
+
+model User {
+  id               Int             @id @default(autoincrement())
+  name             String
+  email            String          @unique
+  passwordHash     String
+  roleId           Int
+  role             Role            @relation(fields: [roleId], references: [id])
+  isActive         Boolean         @default(true)
+  refreshTokenHash String?
+  createdAt        DateTime        @default(now())
+  ownedProjects    Project[]       @relation("ProjectOwner")
+  memberships      ProjectMember[]
+  assignedStages   ProjectStage[]
+}
+
+model SopVersion {
+  id            Int        @id @default(autoincrement())
+  name          String
+  versionNumber Int?
+  status        SopStatus  @default(draft)
+  publishedAt   DateTime?
+  createdAt     DateTime   @default(now())
+  stages        SopStage[]
+  projects      Project[]
+}
+
+model SopStage {
+  id            Int        @id @default(autoincrement())
+  sopVersionId  Int
+  sopVersion    SopVersion @relation(fields: [sopVersionId], references: [id], onDelete: Cascade)
+  name          String
+  order         Int
+  clientVisible Boolean    @default(false)
+}
+
+model Project {
+  id           Int             @id @default(autoincrement())
+  name         String
+  description  String?
+  sopVersionId Int
+  sopVersion   SopVersion      @relation(fields: [sopVersionId], references: [id])
+  ownerId      Int
+  owner        User            @relation("ProjectOwner", fields: [ownerId], references: [id])
+  createdById  Int
+  createdAt    DateTime        @default(now())
+  members      ProjectMember[]
+  stages       ProjectStage[]
+}
+
+model ProjectMember {
+  projectId Int
+  userId    Int
+  kind      MemberKind
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  user      User    @relation(fields: [userId], references: [id])
+
+  @@id([projectId, userId])
+}
+
+model ProjectStage {
+  id             Int                  @id @default(autoincrement())
+  projectId      Int
+  project        Project              @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  name           String
+  order          Int
+  clientVisible  Boolean
+  status         StageStatus          @default(NotStarted)
+  assigneeId     Int?
+  assignee       User?                @relation(fields: [assigneeId], references: [id])
+  dueDate        DateTime?
+  blocker        String?
+  reason         String?
+  completionDate DateTime?
+  remarks        StageRemark[]
+  documents      StageDocument[]
+  history        StageStatusHistory[]
+}
+
+model StageRemark {
+  id      Int          @id @default(autoincrement())
+  stageId Int
+  stage   ProjectStage @relation(fields: [stageId], references: [id], onDelete: Cascade)
+  text    String
+  byId    Int
+  at      DateTime     @default(now())
+}
+
+model StageDocument {
+  id      Int          @id @default(autoincrement())
+  stageId Int
+  stage   ProjectStage @relation(fields: [stageId], references: [id], onDelete: Cascade)
+  name    String
+  url     String
+  byId    Int
+  at      DateTime     @default(now())
+}
+
+model StageStatusHistory {
+  id          Int          @id @default(autoincrement())
+  stageId     Int
+  stage       ProjectStage @relation(fields: [stageId], references: [id], onDelete: Cascade)
+  projectId   Int
+  oldStatus   StageStatus
+  newStatus   StageStatus
+  changedById Int
+  note        String?
+  at          DateTime     @default(now())
+}
+
+model AuditLog {
+  id         Int      @id @default(autoincrement())
+  actorId    Int
+  action     String
+  entityType String
+  entityId   String
+  oldValue   Json?
+  newValue   Json?
+  at         DateTime @default(now())
+}
