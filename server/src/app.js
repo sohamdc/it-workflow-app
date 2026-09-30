@@ -4,6 +4,7 @@ const cookieParser = require('cookie-parser');
 
 const healthRoutes = require('./routes/health');
 const authRoutes = require('./routes/auth');
+const testProtectedRoutes = require('./routes/testProtected');
 const errorHandler = require('./middleware/errorHandler');
 
 const app = express();
@@ -18,6 +19,7 @@ app.use(cookieParser());
 
 app.use('/api/health', healthRoutes);
 app.use('/api/auth', authRoutes);
+app.use('/api/test-protected', testProtectedRoutes);
 
 app.use(errorHandler);
 
