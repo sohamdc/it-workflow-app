@@ -71,15 +71,46 @@ async function createProject(req, res, next) {
 }
 
 // GET /api/projects — list projects visible to the current user
+// async function listProjects(req, res, next) {
+//   try {
+//     const canViewAll = hasPermission(req.user, 'projects:viewAll');
+
+//     const projects = await prisma.project.findMany({
+//       where: canViewAll
+//         ? {} // no filter — see everything
+//         : {
+//             // only projects where I'm the owner or a member (internal or client)
+//             OR: [
+//               { ownerId: req.user.id },
+//               { members: { some: { userId: req.user.id } } },
+//             ],
+//           },
+//       include: { stages: true },
+//       orderBy: { createdAt: 'desc' },
+//     });
+
+//     const result = projects.map((p) => ({
+//       id: p.id,
+//       name: p.name,
+//       sopVersionId: p.sopVersionId,
+//       stageCount: p.stages.length,
+//       completedCount: p.stages.filter((s) => s.status === 'Completed').length,
+//     }));
+
+//     res.json(result);
+//   } catch (err) {
+//     next(err);
+//   }
+// }
+
 async function listProjects(req, res, next) {
   try {
     const canViewAll = hasPermission(req.user, 'projects:viewAll');
 
     const projects = await prisma.project.findMany({
       where: canViewAll
-        ? {} // no filter — see everything
+        ? {}
         : {
-            // only projects where I'm the owner or a member (internal or client)
             OR: [
               { ownerId: req.user.id },
               { members: { some: { userId: req.user.id } } },
@@ -89,12 +120,15 @@ async function listProjects(req, res, next) {
       orderBy: { createdAt: 'desc' },
     });
 
+    // Always include the full "stages" array here (not just counts) so that
+    // filterClientData — which looks for a "stages" property — can correctly
+    // sanitize each project before it's sent. We compute counts AFTER
+    // filtering happens, by deriving them from whatever stages survive.
     const result = projects.map((p) => ({
       id: p.id,
       name: p.name,
       sopVersionId: p.sopVersionId,
-      stageCount: p.stages.length,
-      completedCount: p.stages.filter((s) => s.status === 'Completed').length,
+      stages: p.stages, // full stage objects for now; filterClientData will trim per-user
     }));
 
     res.json(result);
