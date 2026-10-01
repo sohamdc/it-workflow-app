@@ -9,6 +9,8 @@ const auditRoutes = require('./routes/audit');
 const sopRoutes = require('./routes/sop');
 const projectRoutes = require('./routes/projects');
 const stageRoutes = require('./routes/stages');
+const userRoutes = require('./routes/users');
+const roleRoutes = require('./routes/roles');
 const errorHandler = require('./middleware/errorHandler');
 
 const app = express();
@@ -27,7 +29,9 @@ app.use('/api/test-protected', testProtectedRoutes);
 app.use('/api/audit', auditRoutes);
 app.use('/api/sop', sopRoutes);
 app.use('/api/projects', projectRoutes);
-app.use('/api/projects', stageRoutes); // same prefix, different route file
+app.use('/api/projects', stageRoutes);
+app.use('/api/users', userRoutes);
+app.use('/api/roles', roleRoutes);
 
 app.use(errorHandler);
 
