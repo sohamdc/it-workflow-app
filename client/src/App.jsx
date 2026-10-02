@@ -3,17 +3,17 @@ import { useDispatch, useSelector } from 'react-redux';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { restoreSession } from './store/authSlice';
 import Login from './pages/Login';
+import Layout from './components/Layout';
+import ProtectedRoute from './components/Protectedroute';
 
-// Temporary placeholder pages — these get replaced in F3 onward.
 function Placeholder({ title }) {
   return <div style={{ padding: 40 }}><h2>{title}</h2><p>This page will be built in a later module.</p></div>;
 }
 
 function App() {
   const dispatch = useDispatch();
-  const { sessionChecked } = useSelector((state) => state.auth);
+  const { sessionChecked, user } = useSelector((state) => state.auth);
 
-  // On first load, try to restore a session from the refresh cookie.
   useEffect(() => {
     dispatch(restoreSession());
   }, [dispatch]);
@@ -25,12 +25,33 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/login" element={<Login />} />
-        <Route path="/sop" element={<Placeholder title="SOP Builder" />} />
-        <Route path="/users" element={<Placeholder title="User Management" />} />
-        <Route path="/projects" element={<Placeholder title="Workflow Board" />} />
-        <Route path="/client" element={<Placeholder title="Client View" />} />
-        <Route path="/" element={<Navigate to="/login" />} />
+        <Route path="/login" element={user ? <Navigate to="/" replace /> : <Login />} />
+
+        {/* Every route below shares the Layout (nav bar) and is permission-gated */}
+        <Route element={<Layout />}>
+          <Route
+            path="/sop"
+            element={<ProtectedRoute module="sop" action="view"><Placeholder title="SOP Builder" /></ProtectedRoute>}
+          />
+          <Route
+            path="/users"
+            element={<ProtectedRoute module="users" action="manage"><Placeholder title="User Management" /></ProtectedRoute>}
+          />
+          <Route
+            path="/projects"
+            element={<ProtectedRoute module="projects" action="view"><Placeholder title="Workflow Board" /></ProtectedRoute>}
+          />
+          <Route
+            path="/client"
+            element={<ProtectedRoute module="projects" action="view"><Placeholder title="Client View" /></ProtectedRoute>}
+          />
+          <Route
+            path="/audit"
+            element={<ProtectedRoute module="audit" action="view"><Placeholder title="Audit Log" /></ProtectedRoute>}
+          />
+        </Route>
+
+        <Route path="/" element={<Navigate to="/login" replace />} />
       </Routes>
     </BrowserRouter>
   );
