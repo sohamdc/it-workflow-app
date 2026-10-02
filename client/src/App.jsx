@@ -4,7 +4,8 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { restoreSession } from './store/authSlice';
 import Login from './pages/Login';
 import Layout from './components/Layout';
-import ProtectedRoute from './components/Protectedroute';
+import ProtectedRoute from './components/ProtectedRoute';
+import SopBuilder from './pages/SopBuilder';
 
 function Placeholder({ title }) {
   return <div style={{ padding: 40 }}><h2>{title}</h2><p>This page will be built in a later module.</p></div>;
@@ -27,11 +28,10 @@ function App() {
       <Routes>
         <Route path="/login" element={user ? <Navigate to="/" replace /> : <Login />} />
 
-        {/* Every route below shares the Layout (nav bar) and is permission-gated */}
         <Route element={<Layout />}>
           <Route
             path="/sop"
-            element={<ProtectedRoute module="sop" action="view"><Placeholder title="SOP Builder" /></ProtectedRoute>}
+            element={<ProtectedRoute module="sop" action="view"><SopBuilder /></ProtectedRoute>}
           />
           <Route
             path="/users"
