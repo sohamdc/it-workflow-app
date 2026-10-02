@@ -6,6 +6,7 @@ import Login from './pages/Login';
 import Layout from './components/Layout';
 import ProtectedRoute from './components/ProtectedRoute';
 import SopBuilder from './pages/SopBuilder';
+import CreateProject from './pages/CreateProject';
 
 function Placeholder({ title }) {
   return <div style={{ padding: 40 }}><h2>{title}</h2><p>This page will be built in a later module.</p></div>;
@@ -36,6 +37,10 @@ function App() {
           <Route
             path="/users"
             element={<ProtectedRoute module="users" action="manage"><Placeholder title="User Management" /></ProtectedRoute>}
+          />
+          <Route
+            path="/projects/new"
+            element={<ProtectedRoute module="projects" action="create"><CreateProject /></ProtectedRoute>}
           />
           <Route
             path="/projects"

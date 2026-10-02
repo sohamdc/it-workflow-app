@@ -3,9 +3,6 @@ import { Link, Outlet } from 'react-router-dom';
 import { logoutUser } from '../store/authSlice';
 import { usePermission } from '../hooks/usePermission';
 
-// Shared shell around every logged-in page: top nav + whichever page is active (via <Outlet />).
-// Each nav link only renders if the user actually has the matching permission —
-// so a Client, for example, never even sees a "Users" link to begin with.
 function Layout() {
   const user = useSelector((state) => state.auth.user);
   const dispatch = useDispatch();
@@ -13,6 +10,7 @@ function Layout() {
   const canManageSop = usePermission('sop', 'manage') || usePermission('sop', 'view');
   const canManageUsers = usePermission('users', 'manage');
   const canViewProjects = usePermission('projects', 'view');
+  const canCreateProjects = usePermission('projects', 'create');
   const canViewAudit = usePermission('audit', 'view');
 
   return (
@@ -21,6 +19,7 @@ function Layout() {
         {canManageSop && <Link to="/sop">SOP Builder</Link>}
         {canManageUsers && <Link to="/users">Users</Link>}
         {canViewProjects && <Link to="/projects">Projects</Link>}
+        {canCreateProjects && <Link to="/projects/new">+ New Project</Link>}
         {user?.role === 'Client' && <Link to="/client">My Projects</Link>}
         {canViewAudit && <Link to="/audit">Audit Log</Link>}
 
