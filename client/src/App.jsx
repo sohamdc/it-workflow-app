@@ -7,6 +7,7 @@ import Layout from './components/Layout';
 import ProtectedRoute from './components/ProtectedRoute';
 import SopBuilder from './pages/SopBuilder';
 import CreateProject from './pages/CreateProject';
+import WorkflowBoard from './pages/WorkflowBoard';
 
 function Placeholder({ title }) {
   return <div style={{ padding: 40 }}><h2>{title}</h2><p>This page will be built in a later module.</p></div>;
@@ -42,9 +43,9 @@ function App() {
             path="/projects/new"
             element={<ProtectedRoute module="projects" action="create"><CreateProject /></ProtectedRoute>}
           />
-          <Route
+                   <Route
             path="/projects"
-            element={<ProtectedRoute module="projects" action="view"><Placeholder title="Workflow Board" /></ProtectedRoute>}
+            element={<ProtectedRoute module="projects" action="view"><WorkflowBoard /></ProtectedRoute>}
           />
           <Route
             path="/client"
