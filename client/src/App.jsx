@@ -10,6 +10,7 @@ import CreateProject from './pages/CreateProject';
 import WorkflowBoard from './pages/WorkflowBoard';
 import ClientView from './pages/ClientView';
 import UserManagement from './pages/UserManagement';
+import AuditLog from './pages/AuditLog';
 
 function Placeholder({ title }) {
   return <div style={{ padding: 40 }}><h2>{title}</h2><p>This page will be built in a later module.</p></div>;
@@ -56,9 +57,9 @@ function App() {
             element={<ProtectedRoute module="projects" action="view"><ClientView /></ProtectedRoute>}
           />
 
-          <Route
+                  <Route
             path="/audit"
-            element={<ProtectedRoute module="audit" action="view"><Placeholder title="Audit Log" /></ProtectedRoute>}
+            element={<ProtectedRoute module="audit" action="view"><AuditLog /></ProtectedRoute>}
           />
         </Route>
 

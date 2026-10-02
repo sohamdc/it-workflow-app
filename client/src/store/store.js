@@ -3,6 +3,7 @@ import authReducer from './authSlice';
 import sopReducer from './sopSlice';
 import userReducer from './userSlice';
 import projectReducer from './projectSlice';
+import auditReducer from './auditSlice';
 
 export const store = configureStore({
   reducer: {
@@ -10,5 +11,6 @@ export const store = configureStore({
     sop: sopReducer,
     users: userReducer,
     projects: projectReducer,
+    audit: auditReducer,
   },
 });
